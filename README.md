@@ -1,7 +1,7 @@
 IDP-BOT
 ------
 
-Laravel-Bot che invia l'orario settimanale / giornaliero delle lezioni collegandosi tramite al calendario condiviso della classe.
+Laravel-Bot che invia l'orario settimanale / giornaliero delle lezioni collegandosi tramite API al calendario condiviso della classe.
 
 Dipendenze:
 
