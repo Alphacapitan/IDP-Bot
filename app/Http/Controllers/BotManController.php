@@ -4,7 +4,11 @@ namespace App\Http\Controllers;
 
 use BotMan\BotMan\BotMan;
 use Illuminate\Http\Request;
-use App\Conversations\ExampleConversation;
+//use App\Conversations\ExampleConversation;
+
+use \Spatie\GoogleCalendar\Event;
+use Carbon\Carbon;
+
 
 class BotManController extends Controller
 {
@@ -14,6 +18,20 @@ class BotManController extends Controller
     public function handle()
     {
         $botman = app('botman');
+
+        $botman->hears('^.*(\Bene).*$', function ($bot) {
+            $bot->types();
+            $bot->reply('Ma non benissimo 😎!');
+        });
+
+        $botman->hears('domani', function ($bot) {
+            $results = $this->getTomorrowEvents();
+            $bot->reply($results);
+        });
+
+        $botman->fallback(function(Botman $bot) {
+            $bot->reply("Grandissima la ragazza che la ride... YAAA 😘");
+        });
 
         $botman->listen();
     }
@@ -34,4 +52,10 @@ class BotManController extends Controller
     {
         $bot->startConversation(new ExampleConversation());
     }
+
+    public function getTomorrowEvents() {
+        return "string";
+    }
+
 }
+
