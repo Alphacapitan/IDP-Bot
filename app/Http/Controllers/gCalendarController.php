@@ -22,7 +22,7 @@ class gCalendarController extends Controller
 
     public function getTomorrowEvents() {
         // ricava gli eventi a partire da data di inizio e di fine
-        $events = Event::get(Carbon::tomorrow(), Carbon::tomorrow()->addTomorrow(23));
+        $events = Event::get(Carbon::tomorrow(), Carbon::tomorrow()->addHour(23));
 
         $results = $this->formatEvent($events);
         echo $results;
@@ -31,7 +31,7 @@ class gCalendarController extends Controller
     public function formatEvent($collection) {
 
         //debug
-        $collection->dd();
+        // $collection->dd();
 
         // converte la collection in json
         $collection->toJSON();
@@ -49,8 +49,8 @@ class gCalendarController extends Controller
                 array(
                     "title" => $item->googleEvent->summary,
                     "desc" => $item->googleEvent->description,
-                    "inizio" => Carbon::createFromFormat('H-m', $dt_Init->hour . "-" . $dt_Init->minute)->format('H:i'),
-                    "fine" => Carbon::createFromFormat('H-m', $dt_End->hour . "-" . $dt_End->minute)->format('H:i'),
+                    "inizio" => Carbon::createFromTime($dt_Init->hour, $dt_Init->minute)->format('H:i'),
+                    "fine" => Carbon::createFromTime($dt_End->hour, $dt_End->minute)->format('H:i'),
                 )
             );
 

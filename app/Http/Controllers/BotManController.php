@@ -89,8 +89,8 @@ class BotManController extends Controller
                 array(
                     "title" => $item->googleEvent->summary,
                     "desc" => $item->googleEvent->description,
-                    "inizio" => Carbon::createFromFormat('H-m', $dt_Init->hour . "-" . $dt_Init->minute)->format('H:i'),
-                    "fine" => Carbon::createFromFormat('H-m', $dt_End->hour . "-" . $dt_End->minute)->format('H:i'),
+                    "inizio" => Carbon::createFromTime($dt_Init->hour, $dt_Init->minute)->format('H:i'),
+                    "fine" => Carbon::createFromTime($dt_End->hour, $dt_End->minute)->format('H:i'),
                 )
             );
 
@@ -99,8 +99,8 @@ class BotManController extends Controller
         $message = "";
         foreach ($baseCollection as $key => $value) {
 $message = $message . "
-$value[title] - $value[desc]
-Dalle $value[inizio] Alle $value[fine]
+📒 $value[title] - $value[desc]
+⏱ Dalle $value[inizio] Alle $value[fine]
 ";
         }
         // ritorno il messaggio
