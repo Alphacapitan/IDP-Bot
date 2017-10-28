@@ -16,10 +16,6 @@ class gCalendarController extends Controller
          */
         // ricava gli eventi a partire da data di inizio e di fine
         $events = Event::get(Carbon::today(), Carbon::today()->addHour(23));
-        
-        // Settimana --> todo
-        // echo Carbon::today()->startOfWeek();
-
         $results = $this->formatEvent($events);
         echo $results;
     }
@@ -30,20 +26,41 @@ class gCalendarController extends Controller
          * @return collection
          */
         // ricava gli eventi a partire da data di inizio e di fine
-        $events = Event::get(Carbon::tomorrow(), Carbon::tomorrow()->addDay());
-
+        $events = Event::get(Carbon::yesterday()->addDay(6), Carbon::yesterday()->addDay(6)->endOfDay());
         $results = $this->formatEvent($events);
         echo $results;
     }
 
+    public function getCurrentWeekEvents() {
+        /**
+         * Carica gli eventi della settimana attuale
+         * @return collection
+         */
+        // ricava gli eventi a partire da data di inizio e di fine
+        $events = Event::get(Carbon::today()->startOfWeek(), Carbon::today()->startOfWeek()->addDay(5));
+        $results = $this->formatEvent($events);
+        echo $results;
+    }
+
+    public function getNextWeekEvents() {
+        /**
+         * Carica gli eventi della settimana prossima
+         * @return collection
+         */
+        // ricava gli eventi a partire da data di inizio e di fine
+        $events = Event::get(Carbon::today()->startOfWeek()->addWeek(1), Carbon::today()->startOfWeek()->addWeek(1)->addDay(5));
+        $results = $this->formatEvent($events);
+        echo $results;
+    }
+
+    // 
+    // formatazione risposta
+    // 
     public function formatEvent($collection) {
         /**
          * Converte gli eventi in messaggio
          * @return string
          */
-
-        //debug
-        // $collection->dd();
 
         // controlla se esistono eventi nella collection
         if ($collection->isNotEmpty()) {
@@ -62,6 +79,7 @@ class gCalendarController extends Controller
                 // crea l'array con i dati per i singoli eventi
                 $baseCollection->push(
                     array(
+                        "day" => Carbon::createFromDate($dt_Init->year, $dt_Init->month, $dt_Init->day)->format('l'),
                         "title" => $item->googleEvent->summary,
                         "desc" => $item->googleEvent->description,
                         "inizio" => Carbon::createFromTime($dt_Init->hour, $dt_Init->minute)->format('H:i'),
@@ -71,12 +89,24 @@ class gCalendarController extends Controller
             }
             // crea il messaggio
             $message = "";
-            foreach ($baseCollection as $key => $value) {
-                $message = $message . "$value[title] - $value[desc]" . "\n" . "Dalle $value[inizio] Alle $value[fine]";
+
+            // inizio scrittura messaggio
+            foreach ($baseCollection as $key => $event) {
+                
+                // controlla se il giorno del evento attuale nel ciclo è uguale o diverso dall'evento prima
+                if ($key == 0 || $event["day"] != $baseCollection[$key - 1]["day"]) {
+                    // in sia il primo evento o diverso aggiunge il giorno dell'evento
+                    $message = $message . "🗓" . __("day." . $event["day"]) . "\n\n";
+                }
+
+                // compila il messaggio
+                $message = $message . "📒 $event[title] - $event[desc]" . "\n" . "⏱ Dalle $event[inizio] Alle $event[fine]" . "\n\n";
             }
+
             // ritorno il messaggio
             return $message;
         } else {
+            // caso senza eventi
             return "Non ci sono lezioni ✋";
         }
     }
