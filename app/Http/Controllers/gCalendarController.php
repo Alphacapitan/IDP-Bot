@@ -48,7 +48,7 @@ class gCalendarController extends Controller
          * @return collection
          */
         // ricava gli eventi a partire da data di inizio e di fine
-        $events = Event::get(Carbon::today()->startOfWeek()->addWeek(1), Carbon::today()->startOfWeek()->addWeek(1)->addDay(5));
+        $events = Event::get(Carbon::today()->startOfWeek()->next(Carbon::MONDAY), Carbon::today()->startOfWeek()->next(Carbon::MONDAY)->addDay(5));
         $results = $this->formatEvent($events);
         echo $results;
     }

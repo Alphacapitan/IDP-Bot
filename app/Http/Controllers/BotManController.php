@@ -4,11 +4,8 @@ namespace App\Http\Controllers;
 
 use BotMan\BotMan\BotMan;
 use Illuminate\Http\Request;
-use App\Conversations\ExampleConversation;
-
 use \Spatie\GoogleCalendar\Event;
 use Carbon\Carbon;
-
 
 class BotManController extends Controller
 {
@@ -41,7 +38,7 @@ class BotManController extends Controller
         });
 
         // caso -> settimana prossima
-        $botman->hears('prossima settimana', function ($bot) {
+        $botman->hears('settimana prossima', function ($bot) {
             $events = $this->getNextWeekEvents();
             $results = $this->formatEvent($events);
             $bot->reply($results);
@@ -49,7 +46,7 @@ class BotManController extends Controller
 
         // caso -> fallback
         $botman->fallback(function(Botman $bot) {
-            $bot->reply("Puoi chiedermi l'orario di oggi e l'orario di domani");
+            $bot->reply("Puoi chiedermi l'orario di oggi / domani / questa prossima / prossima settimana");
         });
 
         // ascolto
@@ -100,7 +97,7 @@ class BotManController extends Controller
          * @return collection
          */
         // ricava gli eventi a partire da data di inizio e di fine
-        $events = Event::get(Carbon::today()->startOfWeek()->addWeek(1), Carbon::today()->startOfWeek()->addWeek(1)->addDay(5));
+        $events = Event::get(Carbon::today()->startOfWeek()->next(Carbon::MONDAY), Carbon::today()->startOfWeek()->next(Carbon::MONDAY)->addDay(5));
         return $events;
     }
 
