@@ -7,14 +7,21 @@ use Illuminate\Http\Request;
 use \Spatie\GoogleCalendar\Event;
 use Carbon\Carbon;
 
+use App\Conversations\calendarConversation;
+
 class BotManController extends Controller
 {
     //
     // Bot logic
     //
+
     public function handle()
     {
         $botman = app('botman');
+
+        // $botman->hears('Orario', function($bot) {
+        //     $bot->startConversation(new calendarConversation);
+        // });
 
         // caso -> oggi
         $botman->hears('oggi', function ($bot) {
