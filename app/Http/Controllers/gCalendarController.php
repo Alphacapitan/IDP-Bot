@@ -26,7 +26,7 @@ class gCalendarController extends Controller
          * @return collection
          */
         // ricava gli eventi a partire da data di inizio e di fine
-        $events = Event::get(Carbon::yesterday()->addDay(6), Carbon::yesterday()->addDay(6)->endOfDay());
+        $events = Event::get(Carbon::tomorrow(), Carbon::tomorrow()->endOfDay());
         $results = $this->formatEvent($events);
         echo $results;
     }
@@ -64,6 +64,8 @@ class gCalendarController extends Controller
 
         // controlla se esistono eventi nella collection
         if ($collection->isNotEmpty()) {
+
+            // $collection->dd();
             
             // converte la collection in json
             $collection->toJSON();

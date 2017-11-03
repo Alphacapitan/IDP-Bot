@@ -153,10 +153,12 @@ class BotManController extends Controller
 
             // ritorno il messaggio
             return $message;
+
         } else {
             // caso senza eventi
             return "Non ci sono lezioni ✋";
         }
+        
     }
 
 }

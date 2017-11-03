@@ -7,7 +7,7 @@ return [
      * service-account-credentials
      * idp-bot-6e452c2a3c21
      */
-    'service_account_credentials_json' => public_path('/google-calendar/idp-bot-6e452c2a3c21.json'),
+    'service_account_credentials_json' => storage_path('/google-calendar/idp-bot-6e452c2a3c21.json'),
 
     /*
      *  The id of the Google Calendar that will be used by default.
