@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use BotMan\BotMan\BotMan;
 use Illuminate\Http\Request;
-use \Spatie\GoogleCalendar\Event;
+use Spatie\GoogleCalendar\Event;
 use Carbon\Carbon;
 
 use App\Conversations\calendarConversation;
@@ -19,35 +19,35 @@ class BotManController extends Controller
     {
         $botman = app('botman');
 
-        // $botman->hears('Orario', function($bot) {
-        //     $bot->startConversation(new calendarConversation);
-        // });
+        $botman->hears('Orario', function($bot) {
+            $bot->startConversation(new calendarConversation);
+        });
 
         // caso -> oggi
         $botman->hears('oggi', function ($bot) {
             $events = $this->getTodayEvents();
-            $results = $this->formatEvent($events);
+            $results = $this->formatEvent($bot, $events);
             $bot->reply($results);
         });
 
         // caso -> domani
         $botman->hears('domani', function ($bot) {
             $events = $this->getTomorrowEvents();
-            $results = $this->formatEvent($events);
+            $results = $this->formatEvent($bot, $events);
             $bot->reply($results);
         });
 
         // caso -> questa settimana
         $botman->hears('questa settimana', function ($bot) {
             $events = $this->getCurrentWeekEvents();
-            $results = $this->formatEvent($events);
+            $results = $this->formatEvent($bot, $events);
             $bot->reply($results);
         });
 
         // caso -> settimana prossima
         $botman->hears('settimana prossima', function ($bot) {
             $events = $this->getNextWeekEvents();
-            $results = $this->formatEvent($events);
+            $results = $this->formatEvent($bot, $events);
             $bot->reply($results);
         });
 
@@ -59,64 +59,57 @@ class BotManController extends Controller
         // ascolto
         $botman->listen();
     }
-
+    
     /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * Carica gli eventi di oggi
+     * @return collection
      */
-    public function tinker()
+    public function getTodayEvents() 
     {
-        return view('tinker');
-    }
-
-    public function getTodayEvents() {
-        /**
-         * Carica gli eventi di oggi
-         * @return collection
-         */
         // ricava gli eventi a partire da data di inizio e di fine
         $events = Event::get(Carbon::today(), Carbon::today()->endOfDay());
         return $events;
     }
 
-    public function getTomorrowEvents() {
-        /**
-         * Carica gli eventi di domani
-         * @return collection
-         */
+    /**
+     * Carica gli eventi di domani
+     * @return collection
+     */
+    public function getTomorrowEvents() 
+    {
         // ricava gli eventi a partire da data di inizio e di fine
         $events = Event::get(Carbon::tomorrow(), Carbon::tomorrow()->endOfDay());
         return $events;
     }
 
-    public function getCurrentWeekEvents() {
-        /**
-         * Carica gli eventi di domani
-         * @return collection
-         */
+    /**
+     * Carica gli eventi di domani
+     * @return collection
+     */
+    public function getCurrentWeekEvents() 
+    {
         // ricava gli eventi a partire da data di inizio e di fine
         $events = Event::get(Carbon::today()->startOfWeek(), Carbon::today()->startOfWeek()->addDay(5));
         return $events;
     }
 
-    public function getNextWeekEvents() {
-        /**
-         * Carica gli eventi di domani
-         * @return collection
-         */
+    /**
+     * Carica gli eventi di domani
+     * @return collection
+     */
+    public function getNextWeekEvents() 
+    {
         // ricava gli eventi a partire da data di inizio e di fine
         $events = Event::get(Carbon::today()->startOfWeek()->next(Carbon::MONDAY), Carbon::today()->startOfWeek()->next(Carbon::MONDAY)->addDay(5));
         return $events;
     }
 
-    // 
-    // formatazione risposta
-    // 
-    public function formatEvent($collection) {
-        /**
-         * Converte gli eventi in messaggio
-         * @return string
-         */
-
+    /**
+     * Converte gli eventi in messaggio
+     * @return string
+     */
+    public static function formatEvent($bot, $collection) 
+    {
         // controlla se esistono eventi nella collection
         if ($collection->isNotEmpty()) {
             
@@ -134,6 +127,7 @@ class BotManController extends Controller
                 // crea l'array con i dati per i singoli eventi
                 $baseCollection->push(
                     array(
+                        "date" => Carbon::createFromDate($dt_Init->year, $dt_Init->month, $dt_Init->day)->format('d / m'),
                         "day" => Carbon::createFromDate($dt_Init->year, $dt_Init->month, $dt_Init->day)->format('l'),
                         "title" => $item->googleEvent->summary,
                         "desc" => $item->googleEvent->description,
@@ -151,7 +145,7 @@ class BotManController extends Controller
                 // controlla se il giorno del evento attuale nel ciclo è uguale o diverso dall'evento prima
                 if ($key == 0 || $event["day"] != $baseCollection[$key - 1]["day"]) {
                     // in sia il primo evento o diverso aggiunge il giorno dell'evento
-                    $message = $message . "🗓" . __("day." . $event["day"]) . "\n\n";
+                    $message = $message . "🗓" . __("day." . $event["day"]) . " - " . $event["date"] . "\n\n";
                 }
 
                 // compila il messaggio
@@ -162,11 +156,22 @@ class BotManController extends Controller
             return $message;
 
         } else {
+            $sticker = array(
+                'CAADAwADvAMAAqbJWAABK3w6QpBbOb4C',
+                'CAADAQADpzUAAtpxZgcgK5pzKYYkGQI',
+                'CAADBAADSQEAAjewwAAB0dGGAAFbBkUXAg',
+                'CAADAgADHAADyIsGAAFzjQavel2uswI'
+            );
             // caso senza eventi
+            // invia lo stickers delle mancate lezioni
+            $bot->sendRequest('sendSticker', [
+                // invia uno sticker a random
+                'sticker' => $sticker[rand( 0 , count($sticker) )]
+            ]);
+            // ritorno il messaggio che non ci sono lezioni
             return "Non ci sono lezioni ✋";
         }
         
     }
-
 }
 
