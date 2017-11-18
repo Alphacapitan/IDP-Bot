@@ -19,9 +19,9 @@ class BotManController extends Controller
     {
         $botman = app('botman');
 
-        $botman->hears('Orario', function($bot) {
-            $bot->startConversation(new calendarConversation);
-        });
+        // $botman->hears('Orario', function($bot) {
+        //     $bot->startConversation(new calendarConversation);
+        // });
 
         // caso -> oggi
         $botman->hears('oggi', function ($bot) {
@@ -53,7 +53,7 @@ class BotManController extends Controller
 
         // caso -> fallback
         $botman->fallback(function(Botman $bot) {
-            $bot->reply("Puoi chiedermi l'orario di oggi / domani / questa prossima / prossima settimana");
+            $bot->reply("Puoi chiedermi l'orario di oggi / domani / questa prossima / settimana prossima");
         });
 
         // ascolto
