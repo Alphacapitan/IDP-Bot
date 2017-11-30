@@ -19,13 +19,14 @@ class BotManController extends Controller
     {
         $botman = app('botman');
 
-        // $botman->hears('Orario', function($bot) {
-        //     $bot->startConversation(new calendarConversation);
-        // });
+        $botman->hears('Orario', function($bot) {
+            $bot->startConversation(new calendarConversation);
+        });
 
         // caso -> oggi
         $botman->hears('oggi', function ($bot) {
             $events = $this->getTodayEvents();
+            $bot->typesAndWaits(1);
             $results = $this->formatEvent($bot, $events);
             $bot->reply($results);
         });
@@ -33,6 +34,7 @@ class BotManController extends Controller
         // caso -> domani
         $botman->hears('domani', function ($bot) {
             $events = $this->getTomorrowEvents();
+            $bot->typesAndWaits(1);
             $results = $this->formatEvent($bot, $events);
             $bot->reply($results);
         });
@@ -40,6 +42,7 @@ class BotManController extends Controller
         // caso -> questa settimana
         $botman->hears('questa settimana', function ($bot) {
             $events = $this->getCurrentWeekEvents();
+            $bot->typesAndWaits(1);
             $results = $this->formatEvent($bot, $events);
             $bot->reply($results);
         });
@@ -47,13 +50,14 @@ class BotManController extends Controller
         // caso -> settimana prossima
         $botman->hears('settimana prossima', function ($bot) {
             $events = $this->getNextWeekEvents();
+            $bot->typesAndWaits(1);
             $results = $this->formatEvent($bot, $events);
             $bot->reply($results);
         });
 
         // caso -> fallback
         $botman->fallback(function(Botman $bot) {
-            $bot->reply("Puoi chiedermi l'orario di oggi / domani / questa prossima / settimana prossima");
+            $bot->reply("Puoi chiedermi l'orario di: \n👉 Oggi \n👉 Domani \n👉 Questa settimana \n👉 Settimana prossima");
         });
 
         // ascolto

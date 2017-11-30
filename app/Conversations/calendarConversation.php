@@ -59,6 +59,22 @@ class calendarConversation extends Conversation
         };
 
         $results = $this->formatEvent($events);
+        if (!$results) {
+            $sticker = array(
+                'CAADAwADvAMAAqbJWAABK3w6QpBbOb4C',
+                'CAADAQADpzUAAtpxZgcgK5pzKYYkGQI',
+                'CAADBAADSQEAAjewwAAB0dGGAAFbBkUXAg',
+                'CAADAgADHAADyIsGAAFzjQavel2uswI'
+            );
+            // caso senza eventi
+            // invia lo stickers delle mancate lezioni
+            $this->bot->sendRequest('sendSticker', [
+                // invia uno sticker a random
+                'sticker' => $sticker[rand( 0 , count($sticker) )]
+            ]);
+            // Salva la stringa che non ci sono lezioni
+            $results = "Non ci sono lezioni ✋";
+        };
         $this->say($results);
     }
 
@@ -159,7 +175,7 @@ class calendarConversation extends Conversation
 
         } else {
             // ritorno il messaggio che non ci sono lezioni
-            return "Non ci sono lezioni ✋";
+            return false;
         }
     }
 }
