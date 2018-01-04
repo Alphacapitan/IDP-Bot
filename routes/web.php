@@ -15,4 +15,6 @@ Route::get('/', function () {
     return view('home');
 });
 
+// Route::get('/prova', 'BotManController@getNextWeekEvents');
+
 Route::match(['get', 'post'], '/botman', 'BotManController@handle');

@@ -138,22 +138,23 @@ class calendarConversation extends Conversation
 
             foreach ($collection as $key => $item) {
                 // data di inizio
-                $dt_Init = Carbon::parse($item->googleEvent->start->dateTime);
+                $da_Start = Carbon::parse($item->googleEvent->start->dateTime);
                 // data di fine
                 $dt_End = Carbon::parse($item->googleEvent->end->dateTime);
                 
                 // crea l'array con i dati per i singoli eventi
                 $baseCollection->push(
                     array(
-                        "date" => Carbon::createFromDate($dt_Init->year, $dt_Init->month, $dt_Init->day)->format('d / m'),
-                        "day" => Carbon::createFromDate($dt_Init->year, $dt_Init->month, $dt_Init->day)->format('l'),
+                        "date" => Carbon::createFromDate($da_Start->year, $da_Start->month, $da_Start->day)->format('d / m'),
+                        "day" => Carbon::createFromDate($da_Start->year, $da_Start->month, $da_Start->day)->format('l'),
                         "title" => $item->googleEvent->summary,
-                        "desc" => $item->googleEvent->description,
-                        "inizio" => Carbon::createFromTime($dt_Init->hour, $dt_Init->minute)->format('H:i'),
+                        "desc" => trim($item->googleEvent->description, "\n\t"),
+                        "inizio" => Carbon::createFromTime($da_Start->hour, $da_Start->minute)->format('H:i'),
                         "fine" => Carbon::createFromTime($dt_End->hour, $dt_End->minute)->format('H:i'),
                     )
                 );
             }
+
             // crea il messaggio
             $message = "";
 
@@ -161,13 +162,19 @@ class calendarConversation extends Conversation
             foreach ($baseCollection as $key => $event) {
                 
                 // controlla se il giorno del evento attuale nel ciclo è uguale o diverso dall'evento prima
-                if ($key == 0 || $event["day"] != $baseCollection[$key - 1]["day"]) {
-                    // in sia il primo evento o diverso aggiunge il giorno dell'evento
-                    $message = $message . "🗓" . __("day." . $event["day"]) . " - " . $event["date"] . "\n\n";
+                if ($key == 0 || $event["date"] != $baseCollection[$key - 1]["date"]) {
+                    // se primo evento o diverso aggiunge il giorno dell'evento
+                    $message .= "🗓\t" . __("day." . $event["day"]) . " - " . $event["date"] . "\n\n";
                 }
 
                 // compila il messaggio
-                $message = $message . "📒 $event[title] - $event[desc]" . "\n" . "⏱ Dalle $event[inizio] Alle $event[fine]" . "\n\n";
+                // titolo dell'evento
+                $message .= "• $event[title]";
+                // descrizione -> se esiste dell'evento
+                $message .= $event['desc'] ? " - $event[desc]" : "" . "\n";
+                // date dell'evento
+                $message .= "• Dalle $event[inizio] Alle $event[fine]" . "\n\n";
+                // $bot->reply($message);
             }
 
             // ritorno il messaggio
